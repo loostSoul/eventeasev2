@@ -1,30 +1,16 @@
-import { Schema, model, models, Document } from 'mongoose'
+import { Schema, model, models, Document } from 'mongoose';
 
+// Define the interface for the Order
 export interface IOrder extends Document {
-  createdAt: Date
-  stripeId: string
-  totalAmount: string
-  event: {
-    _id: string
-    title: string
-  }
-  buyer: {
-    _id: string
-    firstName: string
-    lastName: string
-  }
+  createdAt: Date;
+  stripeId: string;
+  totalAmount: string;
+  event: Schema.Types.ObjectId; // Store the reference as ObjectId
+  buyer: Schema.Types.ObjectId; // Store the reference as ObjectId
 }
 
-export type IOrderItem = {
-  _id: string
-  totalAmount: string
-  createdAt: Date
-  eventTitle: string
-  eventId: string
-  buyer: string
-}
-
-const OrderSchema = new Schema({
+// Define the schema for the Order
+const OrderSchema = new Schema<IOrder>({
   createdAt: {
     type: Date,
     default: Date.now,
@@ -36,17 +22,22 @@ const OrderSchema = new Schema({
   },
   totalAmount: {
     type: String,
+    required: true, // Optionally make this required
   },
   event: {
-    type: Schema.Types.ObjectId,
-    ref: 'Event',
+    type: Schema.Types.ObjectId, // Type is correctly set here
+    ref: 'Event', // Reference to the Event model
+    required: true,
   },
   buyer: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
+    type: Schema.Types.ObjectId, // Type is correctly set here
+    ref: 'User', // Reference to the User model
+    required: true,
   },
-})
+});
 
-const Order = models.Order || model('Order', OrderSchema)
+// Define the model, ensuring it's only created once
+const Order = models.Order || model<IOrder>('Order', OrderSchema);
 
-export default Order
+// Export the model
+export default Order;
